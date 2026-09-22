@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBank - {% if view == 'login' %}Secure Login{% else %}Premium Account Manager{% endif %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    {% if view == 'login' %}
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating Particles Background */
+        .particles {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(37,99,235,0.4) 0%, rgba(37,99,235,0) 70%);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(10px) translateX(-15px); }
+            75% { transform: translateY(-15px) translateX(-5px); }
+        }
+
+        /* Container */
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        /* Views Container */
+        .views-wrapper {
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .view {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95) translateY(10px);
+        }
+
+        .view.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: scale(1) translateY(0);
+            position: relative;
+        }
+
+        /* Role Selection Cards */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .role-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .role-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .role-card h2 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .role-card p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        /* Forms */
+        .auth-form {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 450px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 38px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toggle-password:hover {
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-muted);
+            margin-top: 15px;
+        }
+
+        .btn-outline:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+    {% else %}
+    <link rel="stylesheet" href="/static/style.css">
+    {% endif %}
+</head>
+<body data-error="{% if error %}true{% else %}false{% endif %}" data-role="{{ role or '' }}">
+
+    {% if view == 'login' %}
+        <!-- Animated Particles -->
+        <div class="particles" id="particles"></div>
+
+        <div class="login-container">
+            
+            <div class="header">
+                <h1>🏦 MyBank</h1>
+                <p>Secure Banking Account Management</p>
+            </div>
+
+            <div class="views-wrapper">
+                
+                <!-- ROLE SELECTION VIEW -->
+                <div class="view active" id="view-selection">
+                    <div class="role-grid">
+                        
+                        <div class="role-card" onclick="switchView('view-customer')">
+                            <div class="role-icon">👤</div>
+                            <h2>Customer Login</h2>
+                            <p>Access your account, check balance, and explore secure banking services.</p>
+                            <div class="btn btn-primary" style="display: inline-block; padding: 10px 24px;">Login as Customer</div>
+                        </div>
+
+                        <div class="role-card" onclick="switchView('view-admin')">
+                            <div class="role-icon">🛡️</div>
+                            <h2>Admin Login</h2>
+                            <p>Manage customer accounts, system operations, and securely oversee banking activities.</p>
+                            <div class="btn btn-primary" style="display: inline-block; padding: 10px 24px;">Login as Admin</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CUSTOMER LOGIN VIEW -->
+                <div class="view" id="view-customer">
+                    <form class="auth-form" action="/login/customer" method="POST">
+                        <div class="form-header">
+                            <h2>👤 Customer Login</h2>
+                            <p style="color: var(--text-muted); font-size: 14px;">Enter your details to access your account</p>
+                        </div>
+                        
+                        {% if error and role == 'customer' %}
+                        <div class="error-msg">{{ error }}</div>
+                        {% endif %}
+
+                        <div class="input-group">
+                            <label>Account Holder Name</label>
+                            <input type="text" name="holder" required placeholder="e.g. John Doe">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Secure PIN</label>
+                            <input type="password" name="pin" id="cust-pin" required placeholder="Enter 4-digit PIN">
+                            <button type="button" class="toggle-password" onclick="togglePassword('cust-pin', this)">Show</button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Secure Login</button>
+                        <button type="button" class="btn btn-outline" onclick="switchView('view-selection')">⬅ Back to Roles</button>
+                    </form>
+                </div>
+
+                <!-- ADMIN LOGIN VIEW -->
+                <div class="view" id="view-admin">
+                    <form class="auth-form" action="/login/admin" method="POST">
+                        <div class="form-header">
+                            <h2>🛡️ Admin Portal</h2>
+                            <p style="color: var(--text-muted); font-size: 14px;">Authorized personnel only</p>
+                        </div>
+
+                        {% if error and role == 'admin' %}
+                        <div class="error-msg">{{ error }}</div>
+                        {% endif %}
+
+                        <div class="input-group">
+                            <label>Admin Username</label>
+                            <input type="text" name="username" required placeholder="Enter username">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Admin Password</label>
+                            <input type="password" name="password" id="admin-pass" required placeholder="Enter password">
+                            <button type="button" class="toggle-password" onclick="togglePassword('admin-pass', this)">Show</button>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Authenticate</button>
+                        <button type="button" class="btn btn-outline" onclick="switchView('view-selection')">⬅ Back to Roles</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            // Switch Views with smooth animation
+            function switchView(viewId) {
+                document.querySelectorAll('.view').forEach(el => {
+                    el.classList.remove('active');
+                });
+                document.getElementById(viewId).classList.add('active');
+            }
+
+            // Toggle Password Visibility
+            function togglePassword(inputId, btn) {
+                const input = document.getElementById(inputId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = 'Hide';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = 'Show';
+                }
+            }
+
+            // Generate Random Particles for Background
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 8; i++) {
+                const size = Math.random() * 300 + 100;
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = (Math.random() * 100) + '%';
+                p.style.top = (Math.random() * 100) + '%';
+                p.style.animationDelay = (Math.random() * 10) + 's';
+                p.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                particlesContainer.appendChild(p);
+            }
+
+            // Automatically show error view if needed
+            const role = document.body.dataset.role;
+            const hasError = document.body.dataset.error;
+            if (hasError === "true" && role) {
+                switchView('view-' + role);
+            }
+        </script>
+    
+    {% else %}
+        <div class="container">
+            <header class="header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1><a href="/" style="color: white; text-decoration: none;">🏦 MyBank</a></h1>
+                        <p>Next-Generation Account Management System</p>
+                    </div>
+                    {% if request.session.get("role") %}
+                    <div>
+                        <a href="/logout" style="background: rgba(255,255,255,0.1); color: white; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2);">Logout ({{ request.session.get("role")|title }})</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if view == 'admin_dashboard' %}
+                <!-- Account List -->
+                <section class="card">
+                    <div class="section-title">
+                        <h2>👥 Account Details</h2>
+                        <span>
+                            Total: {{ accounts|length }}
+                        </span>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <a href="/create" class="btn create-btn">➕ Create New Account</a>
+                    </div>
+
+                    {% if accounts %}
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>PIN</th>
+                                    <th>Balance</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in accounts %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><strong>{{ a[0] }}</strong></td>
+                                    <td><span class="pin">{{ a[1] }}</span></td>
+                                    <td><strong class="balance">₹{{ "%.2f"|format(a[2]) }}</strong></td>
+                                    <td style="display: flex; gap: 10px;">
+                                        <a href="/update/{{ a[0] }}" class="btn update-btn">✏️ Edit</a>
+                                        <a href="/delete_confirm/{{ a[0] }}" class="delete-btn">🗑 Delete</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty">
+                        <div class="empty-icon">🏦</div>
+                        <h3>No Accounts Found</h3>
+                        <p>Create your first account above.</p>
+                    </div>
+                    {% endif %}
+                </section>
+
+            {% elif view == 'customer_dashboard' %}
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 50vh;">
+                    <div class="card" style="max-width: 500px; width: 100%; text-align: center; border-radius: 24px; padding: 40px;">
+                        <div style="font-size: 64px; margin-bottom: 20px;">💳</div>
+                        <h2 style="font-size: 28px; color: var(--text-main); margin-bottom: 10px;">Welcome, {{ account[0] }}!</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 30px;">Your secure account overview</p>
+
+                        {% if msg %}
+                        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">{{ msg }}</div>
+                        {% endif %}
+                        {% if error %}
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">{{ error }}</div>
+                        {% endif %}
+
+                        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; padding: 30px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; text-align: left; box-shadow: var(--shadow-md);">
+                            <div style="position: absolute; top: -20px; right: -20px; font-size: 100px; opacity: 0.1;">🏦</div>
+                            <p style="font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 5px;">Available Balance</p>
+                            <h1 style="font-size: 42px; font-weight: 700; margin-bottom: 20px; color: #10b981;">₹{{ "%.2f"|format(account[2]) }}</h1>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                <div>
+                                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 3px;">ACCOUNT HOLDER</p>
+                                    <p style="font-size: 16px; font-weight: 600;">{{ account[0]|upper }}</p>
+                                </div>
+                                <div style="font-family: monospace; font-size: 18px; letter-spacing: 2px; color: #cbd5e1;">**** {{ account[1] }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Transactions -->
+                        <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                            <form action="/customer/deposit" method="POST" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                <input type="number" name="amount" step="0.01" min="1" placeholder="Amount" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;">
+                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-top: 0;">Deposit</button>
+                            </form>
+                            <form action="/customer/withdraw" method="POST" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                <input type="number" name="amount" step="0.01" min="1" placeholder="Amount" required style="padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;">
+                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); margin-top: 0;">Withdraw</button>
+                            </form>
+                        </div>
+
+                        <a href="/logout" class="btn" style="background: #f1f5f9; color: var(--text-main); text-decoration: none; display: block; font-weight: 600;">Secure Logout</a>
+                    </div>
+                </div>
+
+            {% elif view == 'create' %}
+                <!-- Create Account -->
+                <section class="card">
+                    <div class="section-title">
+                        <h2>➕ Create Account</h2>
+                        <a href="/" style="text-decoration: none; color: #1d4ed8; font-weight: bold;">⬅ Back to Home</a>
+                    </div>
+                    <form action="/add" method="POST" class="form-grid">
+                        <div class="input-group">
+                            <label>Account Holder</label>
+                            <input type="text" name="holder" placeholder="Enter account holder name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>PIN</label>
+                            <input type="password" name="pin" placeholder="Enter PIN" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Initial Balance</label>
+                            <input type="number" name="balance" step="0.01" min="0" placeholder="Enter balance" required>
+                        </div>
+                        <div class="button-area">
+                            <button type="submit" class="btn create-btn">Create Account</button>
+                        </div>
+                    </form>
+                </section>
+
+            {% elif view == 'update' %}
+                <!-- Update Account -->
+                <section class="card">
+                    <div class="section-title">
+                        <h2>✏️ Update Account</h2>
+                        <a href="/" style="text-decoration: none; color: #1d4ed8; font-weight: bold;">⬅ Back to Home</a>
+                    </div>
+                    <form action="/update/{{ account[0] }}" method="POST" class="form-grid">
+                        <div class="input-group">
+                            <label>Account Holder (Read-only)</label>
+                            <input type="text" name="holder" value="{{ account[0] }}" readonly style="background-color: #f1f5f9; color: #64748b;">
+                        </div>
+                        <div class="input-group">
+                            <label>New PIN</label>
+                            <input type="password" name="pin" placeholder="Enter new PIN" required>
+                        </div>
+                        <div class="input-group">
+                            <label>New Balance</label>
+                            <input type="number" name="balance" step="0.01" min="0" value="{{ account[2] }}" required>
+                        </div>
+                        <div class="button-area">
+                            <button type="submit" class="btn update-btn">Update Account</button>
+                        </div>
+                    </form>
+                </section>
+
+            {% elif view == 'delete' %}
+                <section class="card">
+                    <div class="section-title">
+                        <h2>🗑 Delete Account</h2>
+                    </div>
+                    <div class="empty">
+                        <h3 style="color: #dc2626;">Are you sure you want to delete this account?</h3>
+                        <p style="font-size: 18px; margin-top: 10px;">Account Holder: <strong>{{ account[0] }}</strong></p>
+                        <p style="font-size: 18px;">Balance: <strong class="balance">₹{{ "%.2f"|format(account[2]) }}</strong></p>
+                        
+                        <form action="/delete/{{ account[0] }}" method="POST" style="margin-top: 30px; display: flex; justify-content: center; gap: 20px;">
+                            <a href="/" class="btn" style="background-color: #94a3b8; text-decoration: none; width: 150px; display: inline-block; text-align: center;">Cancel</a>
+                            <button type="submit" class="btn" style="background-color: #dc2626; width: 150px;">Delete Account</button>
+                        </form>
+                    </div>
+                </section>
+            {% endif %}
+
+            <footer>
+                <p>MyBank Premium</p>
+                <small>FastAPI + MySQL &bull; Designed with ♥</small>
+            </footer>
+        </div>
+    {% endif %}
+
+</body>
+</html>
